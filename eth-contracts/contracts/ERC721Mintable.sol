@@ -16,6 +16,10 @@ contract Ownable {
     //  1) create a private '_owner' variable of type address with a public getter function
     address public _owner;
 
+    function getOwner() public view returns (address) {
+        return _owner;
+    }
+
     //  2) create an internal constructor that sets the _owner var to the creater of the contract
     constructor() internal {
         _owner = msg.sender;
@@ -207,16 +211,16 @@ contract ERC721 is Pausable, ERC165 {
         // TODO add 'to' address to token approvals
         // TODO emit Approval Event
 
+        address owner = ownerOf(tokenId);
         // TODO require the given address to not be the owner of the tokenId
         require(
-            to != ownerOf(tokenId),
+            to != owner,
             "To address should not be the owner of the tokenId"
         );
 
         // TODO require the msg sender to be the owner of the contract or isApprovedForAll() to be true
         require(
-            msg.sender == owner() ||
-                isApprovedForAll(ownerOf(tokenId), msg.sender),
+            msg.sender == owner || isApprovedForAll(owner, msg.sender),
             "Msg sender should be the owner of the contract or isApprovedForAll() to be true"
         );
 
@@ -662,7 +666,7 @@ contract ERC721Metadata is ERC721Enumerable, usingOraclize {
 //      -takes in a 'to' address, tokenId, and tokenURI as parameters
 //      -returns a true boolean upon completion of the function
 //      -calls the superclass mint and setTokenURI functions
-contract CustomERC721Token is ERC721Metadata {
+contract ERC721MintableComplete is ERC721Metadata {
     constructor(string memory name, string memory symbol)
         public
         ERC721Metadata(
